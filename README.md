@@ -45,7 +45,7 @@ HAL9042 debug endpoint.
 usage: ?file=<path>  |  ?cmd=<command>&token=<maintenance_token>
 ```
 
-by trying some probable filenames we find
+by trying some probable filenames we find http://localhost:5042/api/debug?file=config.py
 ```
 # HAL9042 web frontend — configuration
 # -------------------------------------
@@ -66,6 +66,11 @@ ADMIN_TOKEN = "h4l_d3bug_t0k3n_2024"
 # is still wired in app.py.
 DEBUG_ENDPOINT = "/api/debug"
 ENV = "development"
+```
+
+from that point we can use commands from a curl or directly from the url
+```
+
 ```
 
 ## Evaluate injection
