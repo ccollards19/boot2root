@@ -208,6 +208,46 @@ sudo -l
 ```
 we get
 ```
+Matching Defaults entries for ol on hal9042:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin, use_pty
+
+User ol may run the following commands on hal9042:
+    (root) NOPASSWD: /opt/hal9042/scripts/report.py
+```
+
+in reports.py we see
+```
+#!/usr/bin/env python3
+"""
+report.py — HAL9042 nightly evaluation report generator
+=======================================================
+Run by ol via sudo (see `sudo -l`). Aggregates the day's evaluations into a
+summary using the shared helpers in /opt/hal9042/lib.
+
+  ol ALL=(root) NOPASSWD: /opt/hal9042/scripts/report.py
+"""
+import sys
+
+# Shared evaluation helpers live in the team-writeable lib dir.
+sys.path.insert(0, "/opt/hal9042/lib")
+
+import moulai_utils   # noqa: E402  (provided by the lib/ directory)
+
+
+def main():
+    print("[report] HAL9042 nightly report")
+    print("[report] evaluations today:", moulai_utils.count_today())
+    print("[report] done.")
+
+
+if __name__ == "__main__":
+    main()
 
 ```
 
+this script is not editable but we can change the moulai_utils and launch a shell from there
+
+### root
+
+we got root
