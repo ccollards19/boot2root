@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Usage: ./brute_force.sh <password_list_file> <encrypted_key_file> [user@localhost]
+# Usage: ./brute_force.sh <password_list_file> <encrypted_key_file> 
 
 set -u
 
 PASSLIST="$1"
 KEYFILE="$2"
-TARGET="${3:-user@localhost}"
 
 [ -f "$PASSLIST" ] || { echo "Password list not found: $PASSLIST"; exit 1; }
 [ -f "$KEYFILE" ]   || { echo "Key file not found: $KEYFILE"; exit 1; }
@@ -22,8 +21,7 @@ while IFS= read -r pass || [ -n "$pass" ]; do
 
     if ssh-keygen -y -P "$pass" -f "$KEYFILE" >/dev/null 2>&1; then
         echo "FOUND: password is '$pass'"
-        echo "Connecting to $TARGET..."
-        exec ssh -i "$KEYFILE" "$TARGET" -p 6060
+	exit 0
     fi
 done < "$PASSLIST"
 
