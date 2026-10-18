@@ -180,6 +180,30 @@ it's the most common password in the world. she used to laugh at people for it.
 we indeed get a file in .ssh
 
 we can brute force the password with a list of common password
+cf script
+
+### sophie
+
+we can see this in ol's home
+```
+sophie@hal9042:/home/ol/scripts$ cat check.sh 
+#!/bin/bash
+# check.sh — HAL9042 health probe
+# Run from ol's crontab every 5 minutes. Writes a heartbeat to the log.
+#
+# ol: keep this lightweight. it runs as me, every 5 min, forever.
+
+LOG=/var/log/hal9042/check.log
+echo "$(date -u +%FT%TZ) [check] hal9042d heartbeat: nominal" >> "$LOG" 2>/dev/null
+echo "$(date -u +%FT%TZ) [check] confidence: nominal" >> "$LOG" 2>/dev/null
+```
+we can't modify this from sophie but from wil we can
+the script will execute as ol so we just have to wait for the cronjob to execute
+
+### ol
+
+if we do 
+```
+sudo -l
 ```
 
-```
