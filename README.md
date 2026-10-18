@@ -206,4 +206,8 @@ if we do
 ```
 sudo -l
 ```
+we get
+```
+
+```
 
