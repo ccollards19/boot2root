@@ -251,3 +251,10 @@ this script is not editable but we can change the moulai_utils and launch a shel
 ### root
 
 we got root
+
+## flag
+
+we find the first flag by playing with the url.
+/flag gives us
+:
+
